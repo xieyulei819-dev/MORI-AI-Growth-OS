@@ -1,5 +1,13 @@
 # pnpm-only settings. This file is ignored by npm / yarn, so `npm install`
 # keeps working for reviewers who prefer npm.
+#
+# `packages` 是 pnpm 9（Railway 构建环境默认版本）的硬性要求：
+# 只要存在 pnpm-workspace.yaml 却没有 packages 字段，pnpm 9 会直接报
+# "packages field missing or empty" 并中断安装。
+packages:
+  - "."
+
+# 以下两项是 pnpm 10/11 的设置（声明依赖的构建脚本许可、跳过新版本冷却期）。
 allowBuilds:
   "@prisma/client": true
   "@prisma/engines": true
