@@ -7,6 +7,19 @@
 > **Demo / 模拟业务数据**。本项目**不冒充任何真实公司**，也**不声称任何真实商业成绩**（没有“销售额提升 300%”这类表述）。
 > 项目重点验证的是：**AI 在营销分析与增长决策中的应用工作流**。
 
+**一句话介绍**：AI 驱动的营销增长决策工作台 —— 把市场洞察、用户分析、内容策划、广告投放、数据分析、
+AI 诊断与实验优化串成完整增长闭环。
+
+**产品闭环**：
+
+```text
+Market → Audience → Content → Creative → Campaign → Analytics → AI Insight → Experiment → Optimization → Report
+```
+
+**快速导航**：为什么做 MORI · Demo 数据说明 · 我的工作与 Codex 的分工 · 核心功能模块 · AI Agent 架构 ·
+Campaign Analytics · Experiment Lab · AI 可靠性设计 · 作品集 Case Study · 本地运行 · 测试 · Deployment
+（GitHub 右上角的 Outline 可直接跳转）
+
 ---
 
 ## Overview
@@ -25,6 +38,49 @@ MORI AI Growth OS 是一个可以真实运行、可以完整演示的 **AI 增�
 **OpenAI-compatible Structured Outputs（JSON Schema）**，并由 6 个专职 Agent + 1 个报告 Agent 分工完成。
 
 **无需任何 API Key 也能完整演示**（Demo Mode 使用本地结构化分析引擎，所有数字仍来自数据库实时计算）。
+
+---
+
+## 为什么做 MORI（Why I Built MORI）
+
+我不满足于"做一个能聊天的 AI 页面"，也不认为自己应该去拼算法。我的判断是：
+**AI 在营销增长里的真正价值，取决于业务问题被拆解得有多清楚、数据口径有多可靠。**
+
+所以 MORI 要验证的是一个假设：
+
+> 如果把品牌、产品、人群、竞品、投放、内容、实验这些上下文结构化地交给 AI，
+> 它能不能产出**可执行、可复核、可继续迭代**的增长决策？
+
+现实中的增长工作每天都要跨过这几步，而最耗时、最容易断链的正是"从洞察到行动"这一步：
+
+```text
+市场洞察 → 用户研究 → 内容策划 → 素材制作 → 广告投放 → 数据分析 → 增长决策
+```
+
+常见问题：信息分散（口径不统一）、数据与内容脱节（内容不知道哪条素材在亏钱）、分析依赖人工、
+洞察难以转化为行动、实验与复盘没有形成闭环。
+
+我的背景（税收学 / 商科）反而决定了我的切入点：我更关心**问题定义、指标口径、决策质量与实验设计**，
+而不是模型参数。MORI 就是把这些判断做成一个可以真实运行的工作台。
+
+> 边界说明：MORI 是**个人作品集项目**，不是生产系统；所有业务数据均为 Demo / 模拟数据，
+> 用于验证"AI 如何参与业务决策"的工作流。
+
+---
+
+## Demo 数据说明（Demo / Simulated Business Data）
+
+| 项目 | 说明 |
+| --- | --- |
+| 数据来源 | `prisma/seed.ts` + `src/lib/demo-data.ts` 的确定性生成算法（可复现，同一次 seed 永远得到同一份数据） |
+| 品牌与竞品 | `MORI 森屿` 是虚拟品牌；`AURA LAB / NUVIA / LUMIÉ` 是虚拟竞品，不指向任何真实企业 |
+| 数据规模 | 300 条投放记录（30 天 × 10 条素材）· 150 条分人群记录（5 个人群）· 3 个 Persona · 5 个 Campaign · 10 条 Creative · 36 条内容 · 3 个实验 · 7 个 Prompt · 6 条评估记录 |
+| 核心指标 | 花费 ¥128,600 · 曝光 4,860,000 · 点击 86,200 · 转化 3,240 · CTR 1.77% · CPC ¥1.49 · CVR 3.76% · CPA ¥39.69 · ROAS 3.12（由测试断言 + 原始 SQL 双重复核） |
+| 实验数据 | 全部为 **Demo / Simulated Experiment**：可基于模拟数据推演方向，但**不是真实商业实验**，需要真实流量验证 |
+
+**明确不声称**：没有真实商业客户、没有真实用户、没有真实广告投放、没有真实营收或 ROI 提升。
+所有 AI 结论都被 Prompt 约束为 Demo 口径（例如「模拟实验结果」「Demo 数据显示」「基于模拟数据推演」，
+缺证据的判断必须写成「需要真实数据验证」）。
 
 ---
 
@@ -67,6 +123,43 @@ MORI AI Growth OS 用一个统一的数据模型（品牌 / 产品 / 用户 / �
 减少重复分析工作，提升营销决策效率，让团队更快完成：
 
 **Insight → Action → Experiment → Optimization**
+
+---
+
+## 我的工作与 Codex 的分工（My Role & Codex）
+
+我不是计算机专业出身，也没有把项目包装成"我独立完成了全部代码"。真实分工如下：
+
+### 我负责（产品与业务侧）
+
+| 职责 | 我做的事 |
+| --- | --- |
+| Business Problem Definition | 从营销增长的日常痛点定义问题边界，明确"要解决什么、不解决什么" |
+| Product Structure | 设计 14 个模块的信息架构与页面职责（谁读数据、谁产出内容、谁做决策） |
+| User Flow | 确定「洞察 → 内容 → 投放 → 诊断 → 实验 → 报告」的操作顺序与交接物 |
+| AI Agent Design | 拆出 7 个 Agent（6 个业务 + 1 个报告），划分职责与输出契约；刻意不使用"一个大 Prompt" |
+| Prompt Design | 编写并迭代每个 Agent 的 Prompt，包括输出完整性自检与数据口径规范 |
+| Metric Definition | 定义 CTR / CPC / CVR / CPA / ROAS 的统一口径与除 0 保护 |
+| Experiment Design | 设计 A/B 方案、主辅指标与显著性判断方式（双比例 z 检验 + 最小样本量） |
+| Testing & QA | 指标复核、边界与失败场景验收、发布前验收清单（页面 / 交互 / 密钥 / 口径） |
+| Iteration | 根据真实调用结果持续修正：字段缺失、超时、模型表述口径、移动端体验等 |
+
+### Codex 负责（工程实现侧）
+
+脚手架与配置、页面与组件实现、样式与响应式、数据访问与 API 路由、测试用例与重构、
+部署与截图脚本等工程实现工作。
+
+### 一句话总结我的核心工作
+
+> **我不是单纯使用 AI 生成内容，而是在设计 AI 如何参与业务决策。**
+
+把业务问题拆解成 AI 可以执行的软件流程 —— 定义输入结构、约束输出契约、规定数据口径、
+设计失败兜底，并对结果逐项验收。
+
+### 可核验的结果（发布前验收实测）
+
+14/14 页面可打开 · 关键 AI 按钮均验证到真实后端调用与结果渲染 · 101 个自动化测试通过 ·
+TypeScript 0 error · ESLint 0 problem · 0 浏览器控制台错误 · 0 API Key 泄露（前端产物与页面 HTML 均已扫描）。
 
 ---
 
@@ -210,6 +303,61 @@ CSV 格式错误、CSV 空文件、数字字段为空、除数为 0、数据库�
 
 ---
 
+## Campaign Analytics（数据分析能力）
+
+**设计原则：先把数据算对，再让 AI 做解释 —— 不让 AI 成为"数据真值"的来源。**
+
+指标口径只在一处定义（`src/lib/metrics.ts`），全部带除 0 保护，可被原始 SQL 复核：
+
+| 指标 | 公式 |
+| --- | --- |
+| CTR | clicks / impressions |
+| CPC | spend / clicks |
+| CVR | conversions / clicks |
+| CPA | spend / conversions |
+| ROAS | revenue / spend |
+
+数据链路：
+
+```text
+CSV 上传 → Data Cleaning → Metric Calculation → Trend Analysis
+        → Platform / Creative / Audience 三种切面 → AI Diagnosis
+```
+
+三种切面都来自同一份明细，不会出现口径打架：
+
+| 切面 | 用途 | Demo 数据示例 |
+| --- | --- | --- |
+| 素材级 | 找高效 / 低效素材，决定加预算还是止损 | 「熬夜党晚间修护」CTR 2.41% / ROAS 4.26；「成分党深度解析」CTR 1.21% / ROAS 2.13 |
+| 渠道级 | 看 CPC 与转化贡献的结构差异 | 抖音 / 小红书 / 信息流广告三个渠道的 CPC、CVR、转化占比 |
+| 人群级 | 看"有兴趣"与"会购买"的差距 | 18–24 岁女性 CTR 高但 CVR 低于 25–30 岁女性 |
+
+AI 只负责解释与建议（诊断 / 假设 / 预算调整 / 下一轮实验），并且必须引用上面这些计算结果作为证据。
+总览页的 8 个 KPI 也全部由数据库实时计算 —— 修改 Demo 数据，Dashboard 会随之变化。
+
+---
+
+## Experiment Lab（实验能力）
+
+把"我觉得 B 更好"变成可检验的实验设计：
+
+| 项 | 内容 |
+| --- | --- |
+| 变体 | A / B 直接取自当前数据集中的素材记录（Demo 数据） |
+| 主指标 | CVR（比例型指标 → 双比例 z 检验） |
+| 辅助指标 | CPA / ROAS；建议补埋点：首屏滚动率 / 加购率 / 支付成功率 |
+| 统计方法 | two-proportion z-test：输出 z 值、p 值、置信度与是否显著 |
+| 样本量 | 内置最小样本量估算（例如 +15% 相对提升、α=0.05、power=0.8） |
+| 结论形态 | 「建议保留 A / B 继续测试」或「差异未达显著，继续收集样本」 |
+
+> ⚠️ **所有实验均为 Demo / Simulated Experiment。** 结论只回答"是否值得继续测试"，
+> 表述必须是「基于模拟数据推演，B 方向表现更优，但仍需真实流量验证」，
+> **不会**写成「实验已经证明 B 有效」，也不宣称任何真实业务结果。
+
+实验记录会写入数据库，可在下次复盘时对照假设与实际表现。
+
+---
+
 ## Architecture
 
 ```mermaid
@@ -307,6 +455,24 @@ sequenceDiagram
    但必须写成「模拟实验结果」「Demo 数据显示」「基于模拟数据推演」；禁止使用「已完成实验」「已验证」
    「实际提升 X%」「真实投放验证」「带来收入增长」这类把模拟当成既成事实的表述；缺少真实数据支持的判断
    必须写成「需要真实数据验证」。上传数据集时改用「基于上传的投放数据」口径。
+
+---
+
+## AI 可靠性设计（Structured Output · Fallback · Retry · Timeout）
+
+这一节回答一个面试常见问题：**"如果模型不稳定，你的产品会怎样？"**
+
+| 机制 | 实现 |
+| --- | --- |
+| Structured Output | 每个 Agent 先定义 JSON Schema（由 zod 单一事实来源生成），模型返回结构化对象，前端只渲染 Schema 内的字段 |
+| 校验 | `zod` 全量强校验：字段缺失、`null`、类型错误都会被识别；**不静默修改业务数据**，也不会为了通过校验而放宽 required |
+| 请求形状三级阶梯 | ① `json_schema`（strict）→ ② `json_object` + 把 JSON Schema 与「必填字段清单」注入 prompt → ③ 纯 JSON + 同样注入。DeepSeek 等不支持 strict 的 provider 直接走 ②，不浪费一次必然失败的请求 |
+| strict 兼容处理 | 发往模型的 Schema 会自动剔除 strict 不支持的字段（`minimum` / `maximum` / `pattern` / `default` …），但 zod 仍按原始规则校验返回值 |
+| 修复式重试 | 校验失败时把「缺失 / 类型错误清单」回灌给模型重问（同形状最多 2 次）；`finish_reason=length` 截断时触发"更精简"重试，而不是直接判失败 |
+| 解析容错 | 自动处理 ` ```json ` 代码块围栏、前后夹杂说明文字、尾逗号等语法问题（只修语法，不改内容） |
+| 错误分类与兜底 | `MISSING_API_KEY` / `NETWORK_ERROR` / `TIMEOUT`（默认 120s，可用 `AI_REQUEST_TIMEOUT_MS` 调整）/ `HTTP_ERROR` / `EMPTY_RESPONSE` / `TRUNCATED` / `INVALID_JSON` / `REFUSED` → **全部自动回退到本地 Demo 引擎**，并在结果卡片标注 `AI 失败 · 已回退` 与具体原因，页面不白屏 |
+| 密钥安全 | API Key 只在服务端读取；前端产物既没有 Key 也没有 Provider 域名（已扫描确认）；错误文案统一脱敏为 `sk-***` |
+| 可验证性 | `npm run mock:provider` 提供本地 OpenAI-compatible mock，可用 `MOCK_MODE=http500` / `MOCK_MODE=badjson` 主动制造故障，验证 fallback 链路；101 个测试中包含 12 个结构化输出与可靠性用例 |
 
 ---
 
@@ -549,6 +715,54 @@ MOCK_MODE=badjson npm run mock:provider     # 模拟非 JSON 输出 → 验证 Z
 然后把 `.env.local` 指向它：`DEMO_MODE="false"`、`OPENAI_API_KEY="sk-local-mock"`、
 `OPENAI_BASE_URL="http://127.0.0.1:8787/v1"`、`OPENAI_MODEL="mock-model"`，
 就可以在不消耗任何真实额度的情况下验证 7 个 Agent 的真实调用链路。
+
+---
+
+## Deployment（Railway · 尚未部署）
+
+> 状态：**目前尚未部署到线上**。本节只记录已完成的准备与关键结论，方便后续执行。
+
+### 已完成的部署前验证
+
+| 检查 | 结果 |
+| --- | --- |
+| production build | ✅ `next build` exit 0（5 个静态页预渲染 + 28 条动态路由） |
+| 生产模式实测 | ✅ `next start` 本地运行：15 个页面全部 HTTP 200，CSV 上传写库成功 |
+| TypeScript / ESLint | ✅ 0 error / 0 problem |
+| 自动化测试 | ✅ 101 passed（10 个测试文件） |
+
+### 关键结论：为什么选择 Railway 而不是 Vercel
+
+项目使用 **SQLite** 作为数据库，而 Vercel 的运行时文件系统只读（除 `/tmp`），
+会导致 11 个写数据库的接口失败（6 个 AI 分析接口 + CSV 上传 + 内容保存 + 创建实验 + 生成报告 + 数据管理）。
+因此选择**带持久磁盘的 Node 主机**（Railway / Render / Fly.io / 自建 VPS），**不需要迁移到 Postgres**。
+
+### Railway 最小配置
+
+| 配置项 | 值 |
+| --- | --- |
+| Build Command | `npm run build` |
+| Start Command | `npm start`（会自动使用平台注入的 `PORT`） |
+| Healthcheck Path | `/api/health`（返回 AI 模式 + 数据库行数） |
+| Node 版本 | ≥ 20（推荐 22，可用 `NIXPACKS_NODE_VERSION=22`） |
+| 包管理器 | pnpm（仓库内 `pnpm-lock.yaml` 会自动被识别） |
+| Volume | 挂载到 `/data`（写入持久化的前提） |
+| `DATABASE_URL` | 无 Volume：`file:./dev.db`（用仓库自带已 seed 的 Demo 库）<br>有 Volume：`file:/data/mori.db` |
+| `DEMO_MODE` | `true`（零 API Key 完整运行；Railway 环境变量优先级高于仓库 `.env`） |
+| 初始化数据库 | Volume 方案需在容器内执行一次 `npm run db:setup`（Volume 仅运行时挂载，不能放在 Build 阶段） |
+
+### 可选：开启真实 AI 模式
+
+只需在 Railway 的 **Environment Variables** 里添加（**绝不写入仓库**）：
+
+```bash
+DEMO_MODE="false"
+AI_PROVIDER="deepseek"
+DEEPSEEK_API_KEY="<你的 Key>"
+# 可选：AI_MODEL / AI_REQUEST_TIMEOUT_MS / AI_MAX_TOKENS
+```
+
+配置后可在 Settings → AI Provider 点「测试 AI 连接」验证；失败会自动回退，不影响演示。
 
 ---
 
