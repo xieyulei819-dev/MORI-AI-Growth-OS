@@ -1,0 +1,272 @@
+// MORI AI Growth OS - Prisma schema (SQLite)
+// All business data below is DEMO / 模拟业务数据 for a fictional brand.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id             String   @id @default(cuid())
+  name           String
+  nameEn         String
+  positioning    String
+  description    String
+  productName    String
+  priceRange     String
+  targetAudience String
+  channels       String // JSON array (string)
+  keywords       String // JSON array (string)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Product {
+  id            String  @id @default(cuid())
+  brandName     String
+  name          String
+  category      String
+  positioning   String
+  price         Float
+  volume        String
+  keyBenefits   String // JSON array (string)
+  sellingPoints String // JSON array (string)
+  usageScenario String // JSON array (string)
+  credibility   String // JSON array (string)
+  createdAt     DateTime @default(now())
+}
+
+model Persona {
+  id                 String @id @default(cuid())
+  code               String @unique
+  name               String
+  ageBand            String
+  occupation         String
+  city               String
+  share              Float // share of target audience (0-1)
+  painPoints         String // JSON array
+  motivations        String // JSON array
+  contentPreferences String // JSON array
+  purchaseDrivers    String // JSON array
+  barriers           String // JSON array
+  channels           String // JSON array
+  quote              String
+  accent             String // ui accent token
+  createdAt          DateTime @default(now())
+}
+
+model Competitor {
+  id             String  @id @default(cuid())
+  name           String  @unique
+  positioning    String
+  price          Float
+  priceTier      String
+  professional   Int // 0-100 perceived professional score
+  audience       String
+  contentThemes  String // JSON array
+  mainChannels   String // JSON array
+  adThemes       String // JSON array
+  strength       String
+  weakness       String
+  colorToken     String
+  isSelf         Boolean @default(false)
+  createdAt      DateTime @default(now())
+}
+
+model Campaign {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  objective String
+  platform  String
+  status    String
+  budget    Float
+  startDate DateTime
+  endDate   DateTime
+  note      String
+  createdAt DateTime @default(now())
+}
+
+model Creative {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  campaign    String
+  platform    String
+  theme       String
+  angle       String
+  hook        String
+  cta         String
+  audience    String
+  script      String
+  priority    String
+  status      String
+  targetCtr   Float
+  targetRoas  Float
+  createdAt   DateTime @default(now())
+}
+
+// Daily ad performance records. Seeded with demo data, extended by CSV uploads.
+model Metric {
+  id          String   @id @default(cuid())
+  date        DateTime
+  platform    String
+  campaign    String
+  creative    String
+  spend       Float
+  impressions Int
+  clicks      Int
+  conversions Int
+  revenue     Float
+  source      String   @default("demo") // demo | upload
+  datasetId   String?
+  dataset     Dataset? @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([date])
+  @@index([platform])
+  @@index([creative])
+  @@index([datasetId])
+}
+
+model Dataset {
+  id        String   @id @default(cuid())
+  name      String
+  source    String   @default("upload")
+  rowCount  Int
+  note      String
+  createdAt DateTime @default(now())
+  metrics   Metric[]
+}
+
+// Audience-level cut of the same account totals (age / gender segments).
+// Used by the Audience Intelligence page and the AI Advisor's人群结论.
+model AudienceMetric {
+  id          String   @id @default(cuid())
+  date        DateTime
+  segment     String
+  age         String
+  gender      String
+  spend       Float
+  impressions Int
+  clicks      Int
+  conversions Int
+  revenue     Float
+  createdAt   DateTime @default(now())
+
+  @@index([date])
+  @@index([segment])
+}
+
+model ContentItem {
+  id                 String   @id @default(cuid())
+  title              String
+  platform           String
+  contentType        String
+  goal               String
+  topic              String
+  audience           String
+  hook               String
+  body               String
+  cta                String
+  hookScore          Int
+  relevanceScore     Int
+  conversionScore    Int
+  brandFitScore      Int
+  overallScore       Int
+  whyTest            String
+  howToImprove       String
+  status             String   @default("idea") // idea | testing | scaled | archived
+  mode               String   @default("demo") // demo | ai
+  createdAt          DateTime @default(now())
+}
+
+model Experiment {
+  id              String   @id @default(cuid())
+  name            String
+  hypothesis      String
+  goal            String
+  primaryMetric   String
+  status          String   @default("running") // draft | running | completed
+  startDate       DateTime
+  endDate         DateTime
+  summary         String
+  aiRecommendation String
+  mode            String   @default("demo")
+  createdAt       DateTime @default(now())
+  variants        ExperimentVariant[]
+}
+
+model ExperimentVariant {
+  id          String  @id @default(cuid())
+  experimentId String
+  experiment  Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  label       String
+  name        String
+  description String
+  impressions Int
+  clicks      Int
+  conversions Int
+  spend       Float
+  revenue     Float
+  isWinner    Boolean @default(false)
+}
+
+model Insight {
+  id         String   @id @default(cuid())
+  scope      String // dashboard | audience | market | content | creative | campaign | advisor | report
+  category   String // insight | opportunity | risk | recommendation
+  title      String
+  body       String
+  evidence   String
+  confidence Int
+  agent      String
+  mode       String   @default("demo")
+  createdAt  DateTime @default(now())
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  title       String
+  periodStart DateTime
+  periodEnd   DateTime
+  payload     String // JSON string
+  mode        String   @default("demo")
+  createdAt   DateTime @default(now())
+}
+
+model PromptTemplate {
+  id           String   @id @default(cuid())
+  agent        String   @unique
+  name         String
+  nameZh       String
+  version      String
+  description  String
+  body         String
+  outputSchema String
+  changelog    String
+  isActive     Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+}
+
+model EvaluationRecord {
+  id           String @id @default(cuid())
+  task         String
+  agent        String
+  completeness Int
+  relevance    Int
+  actionability Int
+  accuracy     Int
+  overall      Int
+  notes        String
+  mode         String @default("demo")
+  createdAt    DateTime @default(now())
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

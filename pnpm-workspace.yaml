@@ -1,0 +1,11 @@
+# pnpm-only settings. This file is ignored by npm / yarn, so `npm install`
+# keeps working for reviewers who prefer npm.
+allowBuilds:
+  "@prisma/client": true
+  "@prisma/engines": true
+  core-js: false
+  esbuild: true
+  prisma: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - lucide-react@1.53.0

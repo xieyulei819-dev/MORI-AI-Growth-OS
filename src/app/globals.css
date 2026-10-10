@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --------------------------------------------------------------------------
+   Design tokens — 米白 / 深灰 / 浅绿
+   Defined as CSS variables so the Theme setting can switch the whole product.
+   -------------------------------------------------------------------------- */
+
+:root {
+  --canvas: 246 244 239;
+  --surface: 255 255 255;
+  --surface-muted: 243 241 236;
+  --ink: 30 35 32;
+  --ink-muted: 92 102 96;
+  --ink-soft: 139 148 142;
+  --line: 228 225 217;
+  --moss: 97 140 104;
+  --moss-strong: 59 89 66;
+  --moss-soft: 228 238 228;
+  --clay: 192 138 106;
+  --clay-soft: 240 226 216;
+  --tone-good: 63 125 91;
+  --tone-warn: 176 116 52;
+  --tone-bad: 168 72 63;
+  --tone-info: 75 108 143;
+  --sidebar: 27 33 29;
+  --sidebar-ink: 226 231 224;
+  --sidebar-muted: 150 161 152;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --canvas: 20 23 21;
+  --surface: 28 32 29;
+  --surface-muted: 36 41 37;
+  --ink: 235 238 233;
+  --ink-muted: 168 176 169;
+  --ink-soft: 128 137 130;
+  --line: 52 58 53;
+  --moss: 138 186 146;
+  --moss-strong: 178 214 184;
+  --moss-soft: 38 51 41;
+  --clay: 209 160 128;
+  --clay-soft: 56 45 38;
+  --tone-good: 111 175 137;
+  --tone-warn: 216 161 95;
+  --tone-bad: 217 138 129;
+  --tone-info: 143 176 209;
+  --sidebar: 15 18 16;
+  --sidebar-ink: 226 231 224;
+  --sidebar-muted: 140 152 142;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+  }
+
+  ::selection {
+    background: rgb(var(--moss) / 0.28);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-serif tracking-tight text-ink;
+  }
+
+  *:focus-visible {
+    outline: 2px solid rgb(var(--moss) / 0.6);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--ink-soft) / 0.35);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+}
+
+@layer components {
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium leading-none;
+  }
+
+  .chip-moss {
+    background: rgb(var(--moss-soft));
+    color: rgb(var(--moss-strong));
+  }
+
+  .chip-neutral {
+    background: rgb(var(--surface-muted));
+    color: rgb(var(--ink-muted));
+    border: 1px solid rgb(var(--line));
+  }
+
+  .chip-good {
+    background: rgb(var(--tone-good) / 0.14);
+    color: rgb(var(--tone-good));
+  }
+
+  .chip-warn {
+    background: rgb(var(--tone-warn) / 0.16);
+    color: rgb(var(--tone-warn));
+  }
+
+  .chip-bad {
+    background: rgb(var(--tone-bad) / 0.14);
+    color: rgb(var(--tone-bad));
+  }
+
+  .chip-info {
+    background: rgb(var(--tone-info) / 0.14);
+    color: rgb(var(--tone-info));
+  }
+
+  .chip-clay {
+    background: rgb(var(--clay-soft));
+    color: rgb(var(--clay));
+  }
+
+  .surface {
+    @apply rounded-2xl border border-ink-line bg-surface shadow-card;
+  }
+
+  .surface-muted {
+    @apply rounded-xl border border-ink-line bg-surface-muted;
+  }
+
+  .label-text {
+    @apply text-[11px] font-medium uppercase tracking-[0.14em] text-ink-soft;
+  }
+
+  .prose-copy {
+    @apply text-[13px] leading-relaxed text-ink-muted;
+  }
+
+  .data-value {
+    @apply font-mono text-ink;
+  }
+
+  .grid-bg {
+    background-image: linear-gradient(rgb(var(--line) / 0.55) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--line) / 0.55) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  /* 作品集导出 PDF：隐藏导航与交互元素，避免卡片/截图被拆页 */
+  [data-portfolio-nav],
+  [data-portfolio-noprint] {
+    display: none !important;
+  }
+
+  [data-portfolio-card],
+  [data-portfolio-shot] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  [data-portfolio-shot] img {
+    max-height: 70vh;
+    object-fit: contain;
+  }
+
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  a[href]:after {
+    content: "";
+  }
+}
