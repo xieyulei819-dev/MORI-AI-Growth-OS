@@ -800,6 +800,8 @@ AI_REQUEST_TIMEOUT_MS="120000"
 `DATABASE_URL` 必须指向挂载到 `/data` 的 SQLite Volume，例如 `file:/data/mori.db`。否则 Railway 重启后访客额度会丢失。
 配置后可在 Settings → AI Provider 点「测试 AI 连接」验证；该探针也计入一次真实 AI 体验。
 
+仓库内的 `railway.json` 已固定上述 Start Command 和 `/api/health` 健康检查；Railway 仍需要一个持久 Volume 和环境变量。
+
 ---
 
 ## Testing
