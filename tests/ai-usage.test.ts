@@ -43,7 +43,6 @@ describe.sequential("anonymous AI usage quota", () => {
     process.env.DEMO_MODE = "true";
     process.env.AI_PROVIDER = "openai";
     process.env.OPENAI_API_KEY = "test-only-key";
-    process.env.AI_DEMO_LIMIT = "3";
     process.env.DAILY_AI_LIMIT = "100";
     process.env.AI_RATE_LIMIT_PER_MINUTE = "20";
     const today = dayKey(new Date(), getAiUsagePolicy().timezone);
@@ -58,11 +57,11 @@ describe.sequential("anonymous AI usage quota", () => {
     await prisma.aiDailyUsage.deleteMany({ where: { day: today } });
   });
 
-  it("allows exactly three successful calls and rejects the fourth before fetch", async () => {
+  it("allows exactly five successful calls and rejects the sixth before fetch", async () => {
     const fetchMock = vi.fn(async () => providerResponse());
     vi.stubGlobal("fetch", fetchMock);
 
-    for (let index = 0; index < 3; index += 1) {
+    for (let index = 0; index < 5; index += 1) {
       await expect(callProbe(VISITORS[0])).resolves.toMatchObject({ mode: "json_schema" });
     }
 
@@ -70,10 +69,10 @@ describe.sequential("anonymous AI usage quota", () => {
       code: "DEMO_LIMIT_REACHED",
       status: 429,
     });
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(5);
 
     const usage = await getAiUsageSnapshot(VISITORS[0], getAiUsagePolicy());
-    expect(usage).toMatchObject({ used: 3, remaining: 0, allowed: false });
+    expect(usage).toMatchObject({ used: 5, remaining: 0, allowed: false });
   });
 
   it("does not consume a visitor slot when the provider fails", async () => {
@@ -84,7 +83,7 @@ describe.sequential("anonymous AI usage quota", () => {
     await expect(callProbe(VISITORS[1])).rejects.toMatchObject({ code: "NETWORK_ERROR" });
 
     let usage = await getAiUsageSnapshot(VISITORS[1], getAiUsagePolicy());
-    expect(usage).toMatchObject({ used: 0, reserved: 0, remaining: 3 });
+    expect(usage).toMatchObject({ used: 0, reserved: 0, remaining: 5 });
 
     vi.stubGlobal("fetch", vi.fn(async () => providerResponse()));
     await callProbe(VISITORS[1]);
@@ -92,7 +91,7 @@ describe.sequential("anonymous AI usage quota", () => {
     expect(usage.used).toBe(1);
   });
 
-  it("allows at most three concurrent reservations", async () => {
+  it("allows at most five concurrent reservations", async () => {
     let release: () => void = () => undefined;
     const gate = new Promise<void>((resolve) => {
       release = resolve;
@@ -106,16 +105,16 @@ describe.sequential("anonymous AI usage quota", () => {
     const attempts = Array.from({ length: 6 }, (_, index) =>
       callProbe(VISITORS[2]).catch((error: unknown) => error),
     );
-    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(5));
     release();
     const results = await Promise.all(attempts);
 
-    expect(results.filter((item) => !(item instanceof Error))).toHaveLength(3);
-    expect(results.filter((item) => item instanceof AiExperienceError)).toHaveLength(3);
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(results.filter((item) => !(item instanceof Error))).toHaveLength(5);
+    expect(results.filter((item) => item instanceof AiExperienceError)).toHaveLength(1);
+    expect(fetchMock).toHaveBeenCalledTimes(5);
 
     const usage = await getAiUsageSnapshot(VISITORS[2], getAiUsagePolicy());
-    expect(usage.used).toBe(3);
+    expect(usage.used).toBe(5);
   });
 
   it("enforces the global daily cap before any provider request", async () => {
@@ -133,11 +132,11 @@ describe.sequential("anonymous AI usage quota", () => {
     const fetchMock = vi.fn(async () => providerResponse());
     vi.stubGlobal("fetch", fetchMock);
 
-    for (let index = 0; index < 5; index += 1) {
+    for (let index = 0; index < 7; index += 1) {
       await callProbe(VISITORS[0]);
     }
 
-    expect(fetchMock).toHaveBeenCalledTimes(5);
+    expect(fetchMock).toHaveBeenCalledTimes(7);
     expect(await prisma.aiVisitorUsage.findUnique({ where: { visitorId: VISITORS[0] } })).toBeNull();
   });
 });

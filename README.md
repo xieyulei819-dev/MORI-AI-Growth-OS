@@ -626,10 +626,9 @@ node $pnpm exec next dev -p 3000       # 等价于 npm run dev
 ```bash
 DATABASE_URL="file:./dev.db"                    # SQLite 数据库位置（相对 prisma/）
 
-DEMO_MODE="true"                                # true = 公开 Demo，每位访客最多 3 次真实模型调用
+DEMO_MODE="true"                                # true = 公开 Demo，每位访客最多 5 次真实模型调用
 DEEPSEEK_API_KEY=""                             # 只在服务端读取；真实值放 .env.local，不要提交
 AI_PROVIDER="deepseek"
-AI_DEMO_LIMIT="3"
 DAILY_AI_LIMIT="100"
 AI_RATE_LIMIT_PER_MINUTE="10"
 AI_MAX_INPUT_CHARS="60000"
@@ -641,7 +640,7 @@ AI_REQUEST_TIMEOUT_MS="120000"
 
 ## Public Demo / 本地开发模式
 
-- `DEMO_MODE=true`：公开 Demo 模式。配置 Key 时会真实调用模型，但每位匿名访客最多成功调用 3 次，并受每日全局额度保护；没有 Key 时自动使用本地结构化分析引擎。
+- `DEMO_MODE=true`：公开 Demo 模式。配置 Key 时会真实调用模型，但每位匿名访客最多成功调用 5 次，并受每日全局额度保护；没有 Key 时自动使用本地结构化分析引擎。
 - `DEMO_MODE=false`：本地开发模式。配置 Key 时不限制个人体验次数，适合本人调试（不要在 Railway 公开环境使用）。
 - 它**不是写死的答案**：每句话都由刚算出来的指标拼装（例如“「熬夜党晚间修护」贡献 ¥18,486 花费、ROAS 4.26，高于账户均值 37%”），
   所以**改 Demo 数据或上传自己的 CSV，分析结论会跟着变**。
@@ -710,7 +709,7 @@ Settings → AI Provider 卡片会显示当前的 Provider / Base URL / Model / 
 
 - 访客 ID 由 Middleware 生成随机 UUID，并写入 `HttpOnly; SameSite=Lax; Secure(生产)` Cookie。
 - 所有真实模型请求最终都经过 `src/lib/ai/client.ts` 和 `src/lib/ai/usage.ts`，Route 无法绕过。
-- `AiVisitorUsage` 原子预约 `successCount + inFlightCount` 槽位：最多 3 个并发请求；只有 Schema 合法的模型响应才增加成功次数，失败会释放预约。
+- `AiVisitorUsage` 原子预约 `successCount + inFlightCount` 槽位：最多 5 个并发请求；只有 Schema 合法的模型响应才增加成功次数，失败会释放预约。
 - `AiDailyUsage` 在每次出站请求前原子计数，达到 `DAILY_AI_LIMIT` 后全站暂停 AI 请求。
 - 单次请求同时限制输入字符数、最大输出 token、超时和每访客每分钟请求数。
 
@@ -777,10 +776,10 @@ MOCK_MODE=badjson npm run mock:provider     # 模拟非 JSON 输出 → 验证 Z
 | 包管理器 | pnpm（仓库内 `pnpm-lock.yaml` 会自动被识别） |
 | Volume | 挂载到 `/data`（写入持久化的前提） |
 | `DATABASE_URL` | 无 Volume：`file:./dev.db`（用仓库自带已 seed 的 Demo 库）<br>有 Volume：`file:/data/mori.db` |
-| `DEMO_MODE` | `true`（公开访问 + 每位访客最多 3 次真实 AI；Railway 环境变量优先级高于仓库 `.env`） |
+| `DEMO_MODE` | `true`（公开访问 + 每位访客最多 5 次真实 AI；Railway 环境变量优先级高于仓库 `.env`） |
 | 初始化数据库 | `start:railway` 会安全地为已有库补建 AI 额度表，不重置业务数据。**仅首次空 Volume** 需手动执行一次 `npm run db:setup`；该命令会重建 Demo 数据，之后不要重复执行 |
 
-### 开启公开真实 AI（受 3 次 + 每日 100 次保护）
+### 开启公开真实 AI（受 5 次 + 每日 100 次保护）
 
 只需在 Railway 的 **Environment Variables** 里添加（**绝不写入仓库**）：
 
@@ -789,7 +788,6 @@ DEMO_MODE="true"
 AI_PROVIDER="deepseek"
 DEEPSEEK_API_KEY="<你的 Key>"
 AI_MODEL="<你的账号可用模型名>"
-AI_DEMO_LIMIT="3"
 DAILY_AI_LIMIT="100"
 AI_RATE_LIMIT_PER_MINUTE="10"
 AI_MAX_INPUT_CHARS="60000"

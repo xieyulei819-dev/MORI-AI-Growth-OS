@@ -62,7 +62,7 @@ export function AiUsageBadge() {
 
   if (usage.remaining <= 0) {
     return (
-      <Badge tone="bad" className="hidden sm:inline-flex" title="每位访客最多体验 3 次">
+      <Badge tone="bad" className="hidden sm:inline-flex" title="每位访客最多体验 5 次">
         免费 AI 体验次数已用完
       </Badge>
     );

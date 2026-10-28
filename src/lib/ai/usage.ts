@@ -8,6 +8,8 @@ import { prisma } from "@/lib/db";
 
 export { AI_VISITOR_COOKIE, AI_VISITOR_HEADER } from "@/lib/ai/visitor";
 
+export const PUBLIC_AI_EXPERIENCE_LIMIT = 5;
+
 function readPositiveInt(name: string, fallback: number) {
   const parsed = Number((process.env[name] ?? "").trim());
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
@@ -37,7 +39,7 @@ export function getAiUsagePolicy(): AiUsagePolicy {
   );
   return {
     limited: isPublicAiDemo(),
-    visitorLimit: Math.min(3, readPositiveInt("AI_DEMO_LIMIT", 3)),
+    visitorLimit: PUBLIC_AI_EXPERIENCE_LIMIT,
     dailyLimit: readPositiveInt("DAILY_AI_LIMIT", 100),
     minuteLimit: readPositiveInt("AI_RATE_LIMIT_PER_MINUTE", 10),
     maxInputChars: Math.min(100_000, readPositiveInt("AI_MAX_INPUT_CHARS", 60_000)),
@@ -288,7 +290,7 @@ export async function reserveAiUsage(
     }
     throw new AiExperienceError(
       "DEMO_LIMIT_REACHED",
-      "Demo体验次数已用完，每位访客最多体验3次。",
+      "Demo体验次数已用完，每位访客最多体验5次。",
       429,
       { used: snapshot.used, limit: snapshot.visitorLimit, remaining: snapshot.remaining },
     );

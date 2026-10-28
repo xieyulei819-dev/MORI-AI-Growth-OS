@@ -234,10 +234,9 @@ export function SettingsPanel({
         <CardContent>
           <pre className="overflow-auto rounded-xl bg-surface-muted p-4 font-mono text-[11px] leading-relaxed text-ink-muted">
 {`DATABASE_URL="file:./dev.db"
-DEMO_MODE="true"          # true = 公开 Demo，每人最多 3 次
+DEMO_MODE="true"          # true = 公开 Demo，每人最多 5 次
 AI_PROVIDER="deepseek"
 DEEPSEEK_API_KEY=""       # 放在 .env.local，切勿提交
-AI_DEMO_LIMIT="3"
 DAILY_AI_LIMIT="100"
 AI_RATE_LIMIT_PER_MINUTE="10"
 AI_MAX_INPUT_CHARS="60000"

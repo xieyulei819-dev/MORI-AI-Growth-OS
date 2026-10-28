@@ -781,7 +781,7 @@ export default async function PortfolioPage() {
                     <span className="font-mono text-moss-strong">无 API Key</span> → 本地结构化分析引擎（无需外部服务）
                   </p>
                   <p>
-                    <span className="font-mono text-moss-strong">API Key</span> → 调用真实模型；公开环境每人最多 3 次（Key 只放
+                    <span className="font-mono text-moss-strong">API Key</span> → 调用真实模型；公开环境每人最多 5 次（Key 只放
                     <span className="font-mono"> .env.local</span>，已被 git 忽略）
                   </p>
                   <p>
