@@ -143,16 +143,25 @@ export function getAiConfig(): AiConfig {
   const explicitProvider = readEnv("AI_PROVIDER");
   const aiBaseUrl = readEnv("AI_BASE_URL");
   const legacyBaseUrl = readEnv("OPENAI_BASE_URL");
-  const providerId = detectProviderId(explicitProvider, aiBaseUrl || legacyBaseUrl || PROVIDER_PRESETS.openai.baseUrl);
+  const providerSelection =
+    explicitProvider ||
+    (!aiBaseUrl && !legacyBaseUrl && readEnv("DEEPSEEK_API_KEY") && !readEnv("OPENAI_API_KEY")
+      ? "deepseek"
+      : "");
+  const providerId = detectProviderId(
+    providerSelection,
+    aiBaseUrl || legacyBaseUrl || PROVIDER_PRESETS.openai.baseUrl,
+  );
   const preset = PROVIDER_PRESETS[providerId];
 
   // When AI_PROVIDER is set explicitly the preset wins, so stale OPENAI_* values
   // from a previous provider cannot silently override DeepSeek settings.
-  const baseUrl = (aiBaseUrl || (explicitProvider ? preset.baseUrl : legacyBaseUrl) || preset.baseUrl).replace(
+  const baseUrl = (aiBaseUrl || (providerSelection ? preset.baseUrl : legacyBaseUrl) || preset.baseUrl).replace(
     /\/+$/,
     "",
   );
-  const model = readEnv("AI_MODEL") || (explicitProvider ? preset.model : readEnv("OPENAI_MODEL")) || preset.model;
+  const model =
+    readEnv("AI_MODEL") || (providerSelection ? preset.model : readEnv("OPENAI_MODEL")) || preset.model;
 
   const key = resolveApiKey(providerId);
   const apiKeyConfigured = key !== null;

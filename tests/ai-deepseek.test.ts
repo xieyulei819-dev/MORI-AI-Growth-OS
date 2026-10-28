@@ -107,6 +107,16 @@ describe("DeepSeek provider preset", () => {
     expect(config.reason).toContain("DeepSeek");
   });
 
+  it("infers the DeepSeek preset when only DEEPSEEK_API_KEY is configured", () => {
+    process.env.DEEPSEEK_API_KEY = DEEPSEEK_KEY;
+
+    const config = getAiConfig();
+
+    expect(config.providerId).toBe("deepseek");
+    expect(config.baseUrl).toBe("https://api.deepseek.com");
+    expect(config.keySource).toBe("DEEPSEEK_API_KEY");
+  });
+
   it("ignores stale OPENAI_* values once AI_PROVIDER is set", () => {
     process.env.AI_PROVIDER = "deepseek";
     process.env.DEEPSEEK_API_KEY = DEEPSEEK_KEY;

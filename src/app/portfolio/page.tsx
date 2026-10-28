@@ -41,12 +41,12 @@ const mobileShot = (name: string) => `/portfolio/mobile/${name}.jpg`;
  * - 页面模块 14 个：src/app/(workspace) 下的 14 个业务页面
  * - AI Agent 7 个：Object.keys(AGENT_SCHEMAS).length
  * - Demo 数据行数：prisma/seed.ts 写入的 Metric 记录数（300 条 = 30 天 × 10 条素材）
- * - 自动化测试：npm test 结果（132 passed / 14 files）
+ * - 自动化测试：npm test 结果（133 passed / 14 files）
  */
 const FACTS = {
   pages: 14,
   agents: Object.keys(AGENT_SCHEMAS).length,
-  tests: 132,
+  tests: 133,
   testFiles: 10,
 };
 
