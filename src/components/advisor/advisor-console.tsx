@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, Progress, StatusBadge } from "@/components/ui/feedback";
 import { Textarea } from "@/components/ui/field";
 import type { GrowthAdvice } from "@/lib/ai/schemas";
+import { notifyAiUsageChanged } from "@/lib/ai-usage-client";
 import type { AgentRunMeta } from "@/types";
 
 const SUGGESTIONS = [
@@ -87,6 +88,7 @@ export function AdvisorConsole({ datasetId }: { datasetId?: string | null }) {
         );
       } finally {
         setBusy(false);
+        notifyAiUsageChanged();
       }
     },
     [datasetId],

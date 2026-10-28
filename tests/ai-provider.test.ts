@@ -268,12 +268,12 @@ describe("real AI mode request behaviour", () => {
 });
 
 describe("AI config resolution", () => {
-  it("stays in demo mode when DEMO_MODE=true", () => {
+  it("keeps real AI enabled when DEMO_MODE=true and a key exists", () => {
     process.env.DEMO_MODE = "true";
     const config = getAiConfig();
     expect(config.demoMode).toBe(true);
-    expect(config.enabled).toBe(false);
-    expect(config.reason).toContain("DEMO_MODE=true");
+    expect(config.enabled).toBe(true);
+    expect(config.reason).toContain("公开 Demo");
   });
 
   it("enables AI mode when DEMO_MODE=false and a key exists", () => {

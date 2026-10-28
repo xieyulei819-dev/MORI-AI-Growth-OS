@@ -17,7 +17,7 @@ import type { Signal, SignalBundle } from "@/types";
  * numbers that were just computed from the (simulated) database rows, so if you
  * change the demo data or upload your own CSV, the analysis changes with it.
  *
- * When DEMO_MODE=false and an API key is present, `lib/ai/runner.ts` calls the
+ * When an API key is present, `lib/ai/runner.ts` calls the
  * real structured-output model instead and only falls back to this engine when
  * the provider fails or returns invalid data.
  */

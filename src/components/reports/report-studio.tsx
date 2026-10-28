@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CopyButton } from "@/components/ui/copy-button";
 import { Alert, Progress, StatusBadge } from "@/components/ui/feedback";
+import { notifyAiUsageChanged } from "@/lib/ai-usage-client";
 import { reportToMarkdown, type ReportMeta } from "@/lib/report";
 import type { GrowthReport } from "@/lib/ai/schemas";
 import type { AgentRunMeta } from "@/types";
@@ -55,6 +56,8 @@ export function ReportStudio({ datasetId, initial }: ReportStudioProps) {
     } catch (caught) {
       setState("error");
       setError(caught instanceof Error ? `网络或服务异常：${caught.message}` : "网络或服务异常");
+    } finally {
+      notifyAiUsageChanged();
     }
   }, [datasetId, router]);
 

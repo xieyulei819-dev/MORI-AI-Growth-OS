@@ -6,6 +6,7 @@ import {
   Compass,
   FileText,
   FlaskConical,
+  Megaphone,
   ScrollText,
   Sparkles,
   Users,
@@ -17,6 +18,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const MODULES = [
+  { href: "/ip", icon: Megaphone, title: "IP 智能选题", en: "IP Planner", text: "输入一个 IP，自动分析人设、联网找热点、生成选题池与评分、TOP 5、口播稿、镜头方案与 7 天内容计划。" },
   { href: "/dashboard", icon: BarChart3, title: "总览 Dashboard", en: "Overview", text: "8 个核心 KPI、趋势图、渠道结构与素材排行，全部由数据库实时计算。" },
   { href: "/brand", icon: Sparkles, title: "品牌中心", en: "Brand Center", text: "品牌定位、产品卖点、渠道与关键词，作为全部 AI 分析的上下文。" },
   { href: "/audience", icon: Users, title: "用户洞察", en: "Audience", text: "3 个 Persona + 分人群投放数据，AI 输出用户 / 内容 / 产品 / 广告机会。" },

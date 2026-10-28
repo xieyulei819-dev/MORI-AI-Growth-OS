@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert } from "@/components/ui/feedback";
+import { notifyAiUsageChanged } from "@/lib/ai-usage-client";
 import { cn } from "@/lib/utils";
 
 type AiStatus = {
@@ -68,6 +69,7 @@ export function SettingsPanel({
       });
     } finally {
       setTesting(false);
+      notifyAiUsageChanged();
     }
   }, [aiStatus.mode, aiStatus.model]);
 
@@ -232,16 +234,20 @@ export function SettingsPanel({
         <CardContent>
           <pre className="overflow-auto rounded-xl bg-surface-muted p-4 font-mono text-[11px] leading-relaxed text-ink-muted">
 {`DATABASE_URL="file:./dev.db"
-DEMO_MODE="true"          # true = 本地结构化引擎，无需 API Key
-OPENAI_API_KEY=""         # DEMO_MODE=false 时必填
-OPENAI_BASE_URL="https://api.openai.com/v1"
-OPENAI_MODEL="gpt-4o-mini"
-AI_REQUEST_TIMEOUT_MS="45000"`}
+DEMO_MODE="true"          # true = 公开 Demo，每人最多 3 次
+AI_PROVIDER="deepseek"
+DEEPSEEK_API_KEY=""       # 放在 .env.local，切勿提交
+AI_DEMO_LIMIT="3"
+DAILY_AI_LIMIT="100"
+AI_RATE_LIMIT_PER_MINUTE="10"
+AI_MAX_INPUT_CHARS="60000"
+AI_MAX_TOKENS="4096"
+AI_REQUEST_TIMEOUT_MS="120000"`}
           </pre>
           <p className="mt-3 text-[11.5px] leading-relaxed text-ink-muted">
-            切换到 AI 模式：把 <code className="font-mono">DEMO_MODE</code> 改为 <code className="font-mono">false</code>
-            并填入 <code className="font-mono">OPENAI_API_KEY</code>，重启开发服务器即可。若调用失败，系统会自动回退到 Demo
-            引擎，并在结果中标注「AI 失败 · 已回退」。
+            本地调试可设 <code className="font-mono">DEMO_MODE=false</code> 并使用真实 Key；公开 Railway
+            环境必须保持 <code className="font-mono">DEMO_MODE=true</code>，限额由服务端强制。模型失败会回退本地引擎，
+            但额度耗尽会直接返回 429。
           </p>
         </CardContent>
       </Card>

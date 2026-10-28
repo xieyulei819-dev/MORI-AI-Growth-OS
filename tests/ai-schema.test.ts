@@ -117,7 +117,7 @@ describe("structured output contract", () => {
     try {
       const result = await runAgent("market_analyst", { context });
       expect(result.meta.mode).toBe("demo");
-      expect(result.meta.warning).toContain("OPENAI_API_KEY");
+      expect(result.meta.warning).toContain("API Key");
     } finally {
       process.env.DEMO_MODE = previousDemoMode;
       process.env.OPENAI_API_KEY = previousKey;

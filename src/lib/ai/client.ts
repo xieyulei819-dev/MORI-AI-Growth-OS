@@ -1,6 +1,12 @@
 import { z, type ZodTypeAny } from "zod";
 
 import { jsonSchemaPromptHint, zodToStructuredOutputFormat } from "@/lib/ai/json-schema";
+import {
+  AiExperienceError,
+  getAiUsagePolicy,
+  isAiExperienceError,
+  reserveAiUsage,
+} from "@/lib/ai/usage";
 import { redactSecrets } from "@/lib/utils";
 
 export type AiConfig = {
@@ -131,8 +137,8 @@ export class AiProviderError extends Error {
 }
 
 export function getAiConfig(): AiConfig {
-  const demoModeRaw = (readEnv("DEMO_MODE") || "true").toLowerCase();
-  const demoMode = demoModeRaw === "true" || demoModeRaw === "1" || demoModeRaw === "yes";
+  const usagePolicy = getAiUsagePolicy();
+  const demoMode = usagePolicy.limited;
 
   const explicitProvider = readEnv("AI_PROVIDER");
   const aiBaseUrl = readEnv("AI_BASE_URL");
@@ -150,21 +156,19 @@ export function getAiConfig(): AiConfig {
 
   const key = resolveApiKey(providerId);
   const apiKeyConfigured = key !== null;
-  // DeepSeek + a ~29KB business context regularly takes 30-90s, and the largest
-  // agent (campaign analysis) can exceed two minutes. 45s used to cut those
-  // calls off, so the default is now 120s (override with AI_REQUEST_TIMEOUT_MS).
-  const timeoutMs = Number(readEnv("AI_REQUEST_TIMEOUT_MS") || 120_000);
+  const timeoutMs = usagePolicy.requestTimeoutMs;
 
   let enabled = false;
   let reason = "";
 
-  if (demoMode) {
-    reason = `DEMO_MODE=true，使用本地结构化分析引擎（不调用外部模型）。`;
-  } else if (!apiKeyConfigured) {
+  if (!apiKeyConfigured) {
     reason = `未检测到 API Key（可设置 ${preset.apiKeyEnv}），已自动回退到 Demo Mode。`;
+  } else if (demoMode) {
+    enabled = true;
+    reason = `公开 Demo 已启用 ${preset.label} 模式：${model} @ ${baseUrl}（每位访客最多 ${usagePolicy.visitorLimit} 次）。`;
   } else {
     enabled = true;
-    reason = `已启用 ${preset.label} 模式：${model} @ ${baseUrl}（密钥来源 ${key.name}）`;
+    reason = `开发者模式已启用 ${preset.label}：${model} @ ${baseUrl}（密钥来源 ${key.name}，不限制个人次数）。`;
   }
 
   return {
@@ -177,7 +181,7 @@ export function getAiConfig(): AiConfig {
     apiKeyConfigured,
     keySource: key?.name ?? null,
     supportsJsonSchema: preset.supportsJsonSchema,
-    timeoutMs: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 120_000,
+    timeoutMs,
     reason,
   };
 }
@@ -189,6 +193,8 @@ export type StructuredCallInput<T extends ZodTypeAny> = {
   userPrompt: string;
   temperature?: number;
   model?: string;
+  /** Internal/test hook; route handlers resolve the HttpOnly cookie visitor. */
+  visitorId?: string;
 };
 
 /** Which request shape the provider accepted (useful for Settings + tests). */
@@ -235,11 +241,14 @@ function resolveTemperature(explicit?: number): number | undefined {
   return Number.isFinite(parsed) ? parsed : 0.4;
 }
 
-function resolveMaxTokens(): number | undefined {
+function resolveMaxTokens(): number {
+  const policy = getAiUsagePolicy();
   const raw = (process.env.AI_MAX_TOKENS ?? "").trim();
-  if (raw === "" || raw === "0") return undefined;
+  if (raw === "" || raw === "0") return policy.maxOutputTokens;
   const parsed = Number(raw);
-  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : undefined;
+  return Number.isFinite(parsed) && parsed > 0
+    ? Math.min(policy.maxOutputTokens, Math.floor(parsed))
+    : policy.maxOutputTokens;
 }
 
 /**
@@ -497,6 +506,17 @@ export async function callStructured<T extends ZodTypeAny>(
     throw providerError("MISSING_API_KEY", "缺少 OPENAI_API_KEY，无法调用外部模型。");
   }
 
+  const usagePolicy = getAiUsagePolicy();
+  const inputChars = input.systemPrompt.length + input.userPrompt.length;
+  if (inputChars > usagePolicy.maxInputChars) {
+    throw new AiExperienceError(
+      "AI_INPUT_TOO_LONG",
+      `AI 输入过长（${inputChars} 字符），最多允许 ${usagePolicy.maxInputChars} 字符。`,
+      422,
+      { inputChars, maxInputChars: usagePolicy.maxInputChars },
+    );
+  }
+
   const model = (input.model ?? config.model).trim();
   const temperature = resolveTemperature(input.temperature);
   const maxTokens = resolveMaxTokens();
@@ -526,13 +546,13 @@ export async function callStructured<T extends ZodTypeAny>(
     ? [jsonSchemaAttempt, jsonObjectAttempt, plainAttempt]
     : [jsonObjectAttempt, plainAttempt];
 
-  // Only the primary attempt carries the configured sampling parameters:
-  // whatever triggers a degradation may have been caused by exactly those
-  // parameters, so the retries go out with the plainest possible request body.
+  // Only the primary attempt carries temperature because it may cause a
+  // compatibility failure. max_tokens stays on every attempt so retries can
+  // never bypass the output-cost guardrail.
   const attempts: ProviderAttempt[] = orderedAttempts.map((attempt, index) => ({
     ...attempt,
     includeTemperature: index === 0,
-    includeMaxTokens: index === 0,
+    includeMaxTokens: true,
   }));
 
   let lastError: AiProviderError | null = null;
@@ -553,7 +573,19 @@ export async function callStructured<T extends ZodTypeAny>(
     pendingRepair = "";
     suffixAfterFailure = "";
 
-    const outcome = await attemptProviderCall(input, attempt, config, model, temperature, maxTokens);
+    const usage = await reserveAiUsage(input.visitorId, usagePolicy);
+    let outcome: AttemptOutcome;
+    try {
+      outcome = await attemptProviderCall(input, attempt, config, model, temperature, maxTokens);
+      if (outcome.kind === "ok") {
+        await usage.commit();
+      } else {
+        await usage.release();
+      }
+    } catch (error) {
+      await usage.release();
+      throw error;
+    }
     totalCalls += 1;
 
     if (outcome.kind === "ok") {
@@ -643,6 +675,7 @@ export async function testAiConnection(): Promise<{
       model: result.model,
     };
   } catch (error) {
+    if (isAiExperienceError(error)) throw error;
     return {
       ok: false,
       mode: "ai",

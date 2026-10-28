@@ -10,6 +10,7 @@ import {
   FileText,
   FlaskConical,
   LayoutDashboard,
+  Megaphone,
   ScrollText,
   Settings,
   Sparkles,
@@ -35,6 +36,12 @@ export const NAV_SECTIONS = [
       { href: "/advisor", label: "AI 增长顾问", labelEn: "AI Advisor", icon: Compass },
       { href: "/experiments", label: "实验中心", labelEn: "Experiments", icon: FlaskConical },
       { href: "/reports", label: "增长报告", labelEn: "Reports", icon: FileText },
+    ],
+  },
+  {
+    title: "IP Planner",
+    items: [
+      { href: "/ip", label: "IP 智能选题", labelEn: "IP Planner", icon: Megaphone },
     ],
   },
   {

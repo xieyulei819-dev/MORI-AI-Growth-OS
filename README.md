@@ -118,6 +118,20 @@ MORI AI Growth OS 用一个统一的数据模型（品牌 / 产品 / 用户 / �
 | 广告投放 | 上传 CSV、找低效素材、拿到预算调整建议 |
 | 面试官 / 评审 | 3 分钟内看完从数据到决策的完整闭环 |
 
+## 附加模块：IP 智能选题与短视频内容策划 Agent
+
+除了品牌增长闭环，仓库里还有一个**独立的短视频内容策划工作台** `/ip`：
+
+> 输入一个 IP（例如 `伊宁房产王总`）→ 分析人设 → 联网找热点 → 生成选题池与评分 →
+> TOP 5 → 30/60/90 秒口播稿 → 镜头脚本与拍摄清单 → 内容矩阵与 7 天计划。
+
+- 6 个专职 Agent（IP Analyst / Trend Researcher / Topic Strategist / Script Writer / Shot Planner / Content Planner）；
+- **复用** MORI 已有的 DeepSeek 调用与结构化输出链路，另有本地结构化引擎，无 Key 也能完整演示；
+- 综合推荐分由固定权重计算（热点15% / 痛点25% / 匹配20% / 差异化15% / 传播15% / 商业10%），每个维度都写评分依据；
+- 事实 / AI推测 / 需要进一步验证 全程标注，没有可靠来源时不编造热点。
+
+详细说明见 [`docs/ip-planner.md`](docs/ip-planner.md)。
+
 ## Core Value
 
 减少重复分析工作，提升营销决策效率，让团队更快完成：
@@ -158,7 +172,7 @@ MORI AI Growth OS 用一个统一的数据模型（品牌 / 产品 / 用户 / �
 
 ### 可核验的结果（发布前验收实测）
 
-14/14 页面可打开 · 关键 AI 按钮均验证到真实后端调用与结果渲染 · 101 个自动化测试通过 ·
+14/14 页面可打开 · 关键 AI 按钮均验证到真实后端调用与结果渲染 · 132 个自动化测试通过 ·
 TypeScript 0 error · ESLint 0 problem · 0 浏览器控制台错误 · 0 API Key 泄露（前端产物与页面 HTML 均已扫描）。
 
 ---
@@ -183,7 +197,7 @@ TypeScript 0 error · ESLint 0 problem · 0 浏览器控制台错误 · 0 API Ke
 
 | 章节 | 内容 |
 | --- | --- |
-| 01 HERO | 标题、一句话介绍、核心数字（14 页面 / 7 Agent / 300 Demo 数据行 / 101 测试）、真实首页截图 |
+| 01 HERO | 标题、一句话介绍、核心数字（14 页面 / 7 Agent / 300 Demo 数据行 / 132 测试）、真实首页截图 |
 | 02 Why I Built MORI | 增长工作的 7 步链路、5 个传统工作方式的问题、MORI 的 10 节点闭环解法 |
 | 03 From Data to Decision | 8 个核心模块 × 真实页面截图（Market / Audience / Content / Creative / Campaign / Advisor / Experiment / Report） |
 | 04 Market Intelligence | 价格 × 专业度矩阵、MORI 与 3 个虚拟竞品对比、市场空白与定位建议 |
@@ -191,7 +205,7 @@ TypeScript 0 error · ESLint 0 problem · 0 浏览器控制台错误 · 0 API Ke
 | 06 Campaign Analytics | 10 个核心指标（真实计算值）+ 数据链路 + 「先算对数据，再让 AI 解释」的设计说明 |
 | 07 AI Growth Advisor | 真实案例（CVR 3.96%→3.06%、ROAS 3.23→2.73、CPA →¥45.06、转化 739→593）+ **FACT / HYPOTHESIS / DATA GAP** + 行动建议 |
 | 08 Experiment Lab | A/B 设计、主指标 CVR、辅助指标、z-test / 最小样本量 / 成功标准（全部标注 Simulated Experiment） |
-| 09 AI Reliability | Structured Output / Failure Fallback / Data Provenance / Security 四张卡片 + 101 tests / TS 0 error / ESLint 0 problem |
+| 09 AI Reliability | Structured Output / Failure Fallback / Data Provenance / Security 四张卡片 + 132 tests / TS 0 error / ESLint 0 problem |
 | 10 Product Quality | 发布前验收结果（14/14 页面、7/7 后端交互、0 控制台错误、0 Key 泄露）+ Demo / AI / Fallback 三种状态 |
 | 11 My Role | 我负责的部分（业务定义、产品结构、Agent 设计、Prompt、指标、实验、测试、迭代）+ 明确说明开发使用 Codex 辅助 |
 | 12 What I Learned | 三点关于 AI 产品与业务决策的体会 |
@@ -398,7 +412,7 @@ flowchart TD
 | Database | SQLite + Prisma 6 | `prisma/dev.db`，随仓库提供已 seed 的 Demo 数据 |
 | AI | OpenAI-compatible `/chat/completions` + Structured Outputs | `lib/ai/client.ts` 使用原生 fetch + JSON Schema |
 | Validation | zod 3 | 同时用于生成 JSON Schema 与校验模型输出 |
-| Tests | Vitest 3 | 101 个用例 / 10 个文件（指标 / CSV / 数据 / 分析 / 统计 / AI 结构 / AI 请求契约 / DeepSeek / 结构化输出完整性 / 模拟数据表述规范） |
+| Tests | Vitest 3 | 132 个用例 / 14 个文件（指标 / CSV / 数据 / 分析 / 统计 / AI 结构 / AI 请求契约 / DeepSeek / 额度与并发 / IP Planner / 模拟数据表述规范） |
 | PDF | jsPDF（客户端） | 周报 PDF 导出 |
 
 ---
@@ -470,9 +484,9 @@ sequenceDiagram
 | strict 兼容处理 | 发往模型的 Schema 会自动剔除 strict 不支持的字段（`minimum` / `maximum` / `pattern` / `default` …），但 zod 仍按原始规则校验返回值 |
 | 修复式重试 | 校验失败时把「缺失 / 类型错误清单」回灌给模型重问（同形状最多 2 次）；`finish_reason=length` 截断时触发"更精简"重试，而不是直接判失败 |
 | 解析容错 | 自动处理 ` ```json ` 代码块围栏、前后夹杂说明文字、尾逗号等语法问题（只修语法，不改内容） |
-| 错误分类与兜底 | `MISSING_API_KEY` / `NETWORK_ERROR` / `TIMEOUT`（默认 120s，可用 `AI_REQUEST_TIMEOUT_MS` 调整）/ `HTTP_ERROR` / `EMPTY_RESPONSE` / `TRUNCATED` / `INVALID_JSON` / `REFUSED` → **全部自动回退到本地 Demo 引擎**，并在结果卡片标注 `AI 失败 · 已回退` 与具体原因，页面不白屏 |
+| 错误分类与兜底 | `MISSING_API_KEY` / `NETWORK_ERROR` / `TIMEOUT` / `HTTP_ERROR` / `EMPTY_RESPONSE` / `TRUNCATED` / `INVALID_JSON` / `REFUSED` → **模型错误自动回退到本地 Demo 引擎**，并标注 `AI 失败 · 已回退`；额度与频率限制返回明确的 HTTP 429，不会被伪装成成功结果 |
 | 密钥安全 | API Key 只在服务端读取；前端产物既没有 Key 也没有 Provider 域名（已扫描确认）；错误文案统一脱敏为 `sk-***` |
-| 可验证性 | `npm run mock:provider` 提供本地 OpenAI-compatible mock，可用 `MOCK_MODE=http500` / `MOCK_MODE=badjson` 主动制造故障，验证 fallback 链路；101 个测试中包含 12 个结构化输出与可靠性用例 |
+| 可验证性 | `npm run mock:provider` 提供本地 OpenAI-compatible mock，可用 `MOCK_MODE=http500` / `MOCK_MODE=badjson` 主动制造故障，验证 fallback 链路；132 个测试中包含 AI 额度、并发与可靠性用例 |
 
 ---
 
@@ -592,7 +606,7 @@ node $pnpm exec next dev -p 3000       # 等价于 npm run dev
 | `npm run db:studio` | Prisma Studio 可视化查看数据库 |
 | `npm run typecheck` | TypeScript 类型检查（`tsc --noEmit`） |
 | `npm run lint` | ESLint（flat config, next/core-web-vitals） |
-| `npm test` | Vitest 单元测试（101 个用例） |
+| `npm test` | Vitest 单元测试（132 个用例） |
 | `npm run verify` | typecheck + lint + test |
 | `npm run prompts:export` | 从源码重新生成 `prompts/*.md` |
 | `npm run mock:provider` | 启动本地 OpenAI-compatible mock（验证真实 AI 模式与 fallback） |
@@ -612,25 +626,30 @@ node $pnpm exec next dev -p 3000       # 等价于 npm run dev
 ```bash
 DATABASE_URL="file:./dev.db"                    # SQLite 数据库位置（相对 prisma/）
 
-DEMO_MODE="true"                                # true = 本地结构化分析引擎，不需要任何 API Key
-OPENAI_API_KEY=""                               # DEMO_MODE=false 时必填；不要写进代码
-OPENAI_BASE_URL="https://api.openai.com/v1"      # 任何 OpenAI-compatible 端点
-OPENAI_MODEL="gpt-4o-mini"
-AI_REQUEST_TIMEOUT_MS="45000"
+DEMO_MODE="true"                                # true = 公开 Demo，每位访客最多 3 次真实模型调用
+DEEPSEEK_API_KEY=""                             # 只在服务端读取；真实值放 .env.local，不要提交
+AI_PROVIDER="deepseek"
+AI_DEMO_LIMIT="3"
+DAILY_AI_LIMIT="100"
+AI_RATE_LIMIT_PER_MINUTE="10"
+AI_MAX_INPUT_CHARS="60000"
+AI_MAX_TOKENS="4096"
+AI_REQUEST_TIMEOUT_MS="120000"
 ```
 
 **任何 API Key 都不会出现在代码或前端 bundle 中**：所有模型调用都发生在服务端 API Route 内。
 
-## Demo Mode
+## Public Demo / 本地开发模式
 
-- 默认 `DEMO_MODE=true`：使用本地结构化分析引擎（`src/lib/ai/demo-engine.ts`）。
+- `DEMO_MODE=true`：公开 Demo 模式。配置 Key 时会真实调用模型，但每位匿名访客最多成功调用 3 次，并受每日全局额度保护；没有 Key 时自动使用本地结构化分析引擎。
+- `DEMO_MODE=false`：本地开发模式。配置 Key 时不限制个人体验次数，适合本人调试（不要在 Railway 公开环境使用）。
 - 它**不是写死的答案**：每句话都由刚算出来的指标拼装（例如“「熬夜党晚间修护」贡献 ¥18,486 花费、ROAS 4.26，高于账户均值 37%”），
   所以**改 Demo 数据或上传自己的 CSV，分析结论会跟着变**。
-- 页面顶部显示 `Demo Mode` 标识，AI 结果卡片上标注 `Demo 引擎`。
+- 页面顶部显示剩余体验次数；HttpOnly Cookie 标识匿名访客，前端无法读取访客 ID。
 
 ## AI Mode
 
-1. 在 `.env.local` 设置 `DEMO_MODE="false"` 与 `OPENAI_API_KEY="sk-..."`
+1. 在 `.env.local` 设置 `DEMO_MODE="false"`、`AI_PROVIDER="deepseek"` 与 `DEEPSEEK_API_KEY="<your-key>"`
 2. 重启 `npm run dev`
 3. 顶部状态变为 `AI · <model>`，Settings → AI Status 可点击「测试 AI 连接」
 
@@ -647,7 +666,7 @@ DEEPSEEK_API_KEY="sk-你的 DeepSeek Key"  # 只在服务端读取
 # 可选覆盖
 AI_MODEL="deepseek-flash"              # 若你的账号是 deepseek-chat，改这里即可（无需改代码）
 AI_TEMPERATURE="0.4"                   # 设 "default" 则完全不发送该参数
-AI_MAX_TOKENS="4000"                   # 周报类长输出建议设置
+AI_MAX_TOKENS="4096"                   # 输出上限，代码硬性封顶 8192
 ```
 
 | 项 | 值 |
@@ -679,11 +698,21 @@ Settings → AI Provider 卡片会显示当前的 Provider / Base URL / Model / 
 }
 ```
 
-任何失败（无 Key / HTTP 错误 / 超时 / JSON 非法 / Schema 不符 / 模型拒答）都会：
+任何模型调用失败（无 Key / HTTP 错误 / 超时 / JSON 非法 / Schema 不符 / 模型拒答）都会：
 
 1. 回退到 Demo 引擎（同一套 Schema）；
 2. 在前端标注 `AI 失败 · 已回退` 与具体原因；
 3. 绝不把非法结构渲染到页面。
+
+额度限制是例外：体验次数或每日额度用完时返回 HTTP 429，不会继续请求模型，也不会偷偷回退成一次成功体验。
+
+### 匿名额度与全局保护
+
+- 访客 ID 由 Middleware 生成随机 UUID，并写入 `HttpOnly; SameSite=Lax; Secure(生产)` Cookie。
+- 所有真实模型请求最终都经过 `src/lib/ai/client.ts` 和 `src/lib/ai/usage.ts`，Route 无法绕过。
+- `AiVisitorUsage` 原子预约 `successCount + inFlightCount` 槽位：最多 3 个并发请求；只有 Schema 合法的模型响应才增加成功次数，失败会释放预约。
+- `AiDailyUsage` 在每次出站请求前原子计数，达到 `DAILY_AI_LIMIT` 后全站暂停 AI 请求。
+- 单次请求同时限制输入字符数、最大输出 token、超时和每访客每分钟请求数。
 
 ### 请求形状降级阶梯（兼容所有 OpenAI-compatible 服务）
 
@@ -718,18 +747,18 @@ MOCK_MODE=badjson npm run mock:provider     # 模拟非 JSON 输出 → 验证 Z
 
 ---
 
-## Deployment（Railway · 尚未部署）
+## Deployment（Railway）
 
-> 状态：**目前尚未部署到线上**。本节只记录已完成的准备与关键结论，方便后续执行。
+> 状态：线上地址以 Railway 项目为准；本仓库未保存可访问域名或部署凭据。修改完成后需推送并重新部署才会生效。
 
 ### 已完成的部署前验证
 
 | 检查 | 结果 |
 | --- | --- |
 | production build | ✅ `next build` exit 0（5 个静态页预渲染 + 28 条动态路由） |
-| 生产模式实测 | ✅ `next start` 本地运行：15 个页面全部 HTTP 200，CSV 上传写库成功 |
+| 生产模式实测 | ✅ `next start` 本地运行：16 个页面全部 HTTP 200，CSV 上传写库成功 |
 | TypeScript / ESLint | ✅ 0 error / 0 problem |
-| 自动化测试 | ✅ 101 passed（10 个测试文件） |
+| 自动化测试 | ✅ 132 passed（14 个测试文件） |
 
 ### 关键结论：为什么选择 Railway 而不是 Vercel
 
@@ -742,34 +771,41 @@ MOCK_MODE=badjson npm run mock:provider     # 模拟非 JSON 输出 → 验证 Z
 | 配置项 | 值 |
 | --- | --- |
 | Build Command | `npm run build` |
-| Start Command | `npm start`（会自动使用平台注入的 `PORT`） |
+| Start Command | `npm run start:railway`（先执行只增量建表的 `prisma db push`，再启动服务） |
 | Healthcheck Path | `/api/health`（返回 AI 模式 + 数据库行数） |
 | Node 版本 | ≥ 20（推荐 22，可用 `NIXPACKS_NODE_VERSION=22`） |
 | 包管理器 | pnpm（仓库内 `pnpm-lock.yaml` 会自动被识别） |
 | Volume | 挂载到 `/data`（写入持久化的前提） |
 | `DATABASE_URL` | 无 Volume：`file:./dev.db`（用仓库自带已 seed 的 Demo 库）<br>有 Volume：`file:/data/mori.db` |
-| `DEMO_MODE` | `true`（零 API Key 完整运行；Railway 环境变量优先级高于仓库 `.env`） |
-| 初始化数据库 | Volume 方案需在容器内执行一次 `npm run db:setup`（Volume 仅运行时挂载，不能放在 Build 阶段） |
+| `DEMO_MODE` | `true`（公开访问 + 每位访客最多 3 次真实 AI；Railway 环境变量优先级高于仓库 `.env`） |
+| 初始化数据库 | `start:railway` 会安全地为已有库补建 AI 额度表，不重置业务数据。**仅首次空 Volume** 需手动执行一次 `npm run db:setup`；该命令会重建 Demo 数据，之后不要重复执行 |
 
-### 可选：开启真实 AI 模式
+### 开启公开真实 AI（受 3 次 + 每日 100 次保护）
 
 只需在 Railway 的 **Environment Variables** 里添加（**绝不写入仓库**）：
 
 ```bash
-DEMO_MODE="false"
+DEMO_MODE="true"
 AI_PROVIDER="deepseek"
 DEEPSEEK_API_KEY="<你的 Key>"
-# 可选：AI_MODEL / AI_REQUEST_TIMEOUT_MS / AI_MAX_TOKENS
+AI_MODEL="<你的账号可用模型名>"
+AI_DEMO_LIMIT="3"
+DAILY_AI_LIMIT="100"
+AI_RATE_LIMIT_PER_MINUTE="10"
+AI_MAX_INPUT_CHARS="60000"
+AI_MAX_TOKENS="4096"
+AI_REQUEST_TIMEOUT_MS="120000"
 ```
 
-配置后可在 Settings → AI Provider 点「测试 AI 连接」验证；失败会自动回退，不影响演示。
+`DATABASE_URL` 必须指向挂载到 `/data` 的 SQLite Volume，例如 `file:/data/mori.db`。否则 Railway 重启后访客额度会丢失。
+配置后可在 Settings → AI Provider 点「测试 AI 连接」验证；该探针也计入一次真实 AI 体验。
 
 ---
 
 ## Testing
 
 ```bash
-npm test           # 101 passed / 10 files
+npm test           # 132 passed / 14 files
 npm run typecheck  # 0 error
 npm run lint       # 0 problem
 ```
@@ -793,7 +829,7 @@ npm run lint       # 0 problem
 | --- | --- | --- |
 | 类型检查 | `tsc --noEmit` | ✅ 0 error |
 | Lint | `eslint .` | ✅ 0 problem |
-| 单元测试 | `vitest run` | ✅ 101 passed / 10 files |
+| 单元测试 | `vitest run` | ✅ 132 passed / 14 files |
 | 全部页面渲染 | `GET / /dashboard /brand /audience /market /content /creative /campaign /advisor /experiments /reports /prompts /evaluation /settings` | ✅ 全部 HTTP 200 |
 | AI 接口 | `POST /api/{audience,market,content,creative,campaign,advisor,reports,experiments,settings}` | ✅ 全部 `ok:true`（Demo 引擎） |
 | CSV 成功上传 | `POST /api/campaign/upload` | ✅ 3 行入库 + 3 条质量提示 |
@@ -849,7 +885,7 @@ MORI-AI-Growth-OS
 │  │  ├─ prompts.ts          # Prompt 单一事实来源（7 个 Agent）
 │  │  └─ ai/                 # client / schemas / json-schema / demo-engine / runner / context
 │  └─ types/index.ts
-└─ tests/                    # 10 个测试文件 / 101 个用例
+└─ tests/                    # 14 个测试文件 / 132 个用例
 ```
 
 ### 页面地图

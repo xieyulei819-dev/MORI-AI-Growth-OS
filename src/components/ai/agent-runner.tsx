@@ -6,6 +6,7 @@ import * as React from "react";
 import { Alert, StatusBadge } from "@/components/ui/feedback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { notifyAiUsageChanged } from "@/lib/ai-usage-client";
 import { cn } from "@/lib/utils";
 import type { AgentRunMeta } from "@/types";
 
@@ -89,6 +90,8 @@ export function AgentRunner<T>({
           ? `网络或服务异常：${caught.message}`
           : "网络或服务异常，请稍后重试。",
       );
+    } finally {
+      notifyAiUsageChanged();
     }
   }, [endpoint, payloadKey, onSuccess]);
 

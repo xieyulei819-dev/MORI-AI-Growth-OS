@@ -156,13 +156,13 @@ describe("DeepSeek provider preset", () => {
     expect(serialized).not.toContain("sk-");
   });
 
-  it("still honours DEMO_MODE=true regardless of provider settings", () => {
+  it("keeps real AI enabled under DEMO_MODE=true when a key exists (public quota handled separately)", () => {
     process.env.DEMO_MODE = "true";
     process.env.AI_PROVIDER = "deepseek";
     process.env.DEEPSEEK_API_KEY = DEEPSEEK_KEY;
     const config = getAiConfig();
     expect(config.demoMode).toBe(true);
-    expect(config.enabled).toBe(false);
+    expect(config.enabled).toBe(true);
   });
 });
 

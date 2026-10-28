@@ -1,4 +1,5 @@
 import { AiProviderError, callStructured, getAiConfig, type StructuredCallInput } from "@/lib/ai/client";
+import { isAiExperienceError } from "@/lib/ai/usage";
 import { contextToPromptPayload, type AgentPayload } from "@/lib/ai/context";
 import {
   demoAudienceAnalysis,
@@ -97,6 +98,7 @@ export async function runAgent<K extends AgentId>(
       },
     };
   } catch (error) {
+    if (isAiExperienceError(error)) throw error;
     const warning =
       error instanceof AiProviderError
         ? `${error.code}: ${error.message}`

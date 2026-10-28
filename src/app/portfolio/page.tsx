@@ -41,12 +41,12 @@ const mobileShot = (name: string) => `/portfolio/mobile/${name}.jpg`;
  * - 页面模块 14 个：src/app/(workspace) 下的 14 个业务页面
  * - AI Agent 7 个：Object.keys(AGENT_SCHEMAS).length
  * - Demo 数据行数：prisma/seed.ts 写入的 Metric 记录数（300 条 = 30 天 × 10 条素材）
- * - 自动化测试：npm test 结果（101 passed / 10 files）
+ * - 自动化测试：npm test 结果（132 passed / 14 files）
  */
 const FACTS = {
   pages: 14,
   agents: Object.keys(AGENT_SCHEMAS).length,
-  tests: 101,
+  tests: 132,
   testFiles: 10,
 };
 
@@ -778,10 +778,10 @@ export default async function PortfolioPage() {
                 <p className="label-text mb-3">三种模式如何切换</p>
                 <div className="space-y-2.5 text-[11.5px] text-ink-muted">
                   <p>
-                    <span className="font-mono text-moss-strong">DEMO_MODE=true</span> → 本地结构化分析引擎（默认，无需 Key）
+                    <span className="font-mono text-moss-strong">无 API Key</span> → 本地结构化分析引擎（无需外部服务）
                   </p>
                   <p>
-                    <span className="font-mono text-moss-strong">DEMO_MODE=false + API Key</span> → 调用真实模型（Key 只放
+                    <span className="font-mono text-moss-strong">API Key</span> → 调用真实模型；公开环境每人最多 3 次（Key 只放
                     <span className="font-mono"> .env.local</span>，已被 git 忽略）
                   </p>
                   <p>

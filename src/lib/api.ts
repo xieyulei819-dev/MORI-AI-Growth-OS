@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { z } from "zod";
 
+import { isAiExperienceError } from "@/lib/ai/usage";
 import { redactSecrets } from "@/lib/utils";
 import type { AgentRunMeta } from "@/types";
 
@@ -42,6 +43,9 @@ export async function readJson(request: Request): Promise<unknown> {
 }
 
 export function serverError(error: unknown, fallbackMessage = "服务内部错误，请稍后重试。") {
+  if (isAiExperienceError(error)) {
+    return fail(error.code, error.message, error.status, error.details);
+  }
   const message = redactSecrets(error instanceof Error ? error.message : fallbackMessage);
   console.error(
     "[MORI][api]",

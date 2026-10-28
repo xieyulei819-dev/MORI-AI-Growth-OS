@@ -26,7 +26,7 @@ model Brand {
 }
 
 model Product {
-  id            String  @id @default(cuid())
+  id            String   @id @default(cuid())
   brandName     String
   name          String
   category      String
@@ -41,8 +41,8 @@ model Product {
 }
 
 model Persona {
-  id                 String @id @default(cuid())
-  code               String @unique
+  id                 String   @id @default(cuid())
+  code               String   @unique
   name               String
   ageBand            String
   occupation         String
@@ -60,21 +60,21 @@ model Persona {
 }
 
 model Competitor {
-  id             String  @id @default(cuid())
-  name           String  @unique
-  positioning    String
-  price          Float
-  priceTier      String
-  professional   Int // 0-100 perceived professional score
-  audience       String
-  contentThemes  String // JSON array
-  mainChannels   String // JSON array
-  adThemes       String // JSON array
-  strength       String
-  weakness       String
-  colorToken     String
-  isSelf         Boolean @default(false)
-  createdAt      DateTime @default(now())
+  id            String   @id @default(cuid())
+  name          String   @unique
+  positioning   String
+  price         Float
+  priceTier     String
+  professional  Int // 0-100 perceived professional score
+  audience      String
+  contentThemes String // JSON array
+  mainChannels  String // JSON array
+  adThemes      String // JSON array
+  strength      String
+  weakness      String
+  colorToken    String
+  isSelf        Boolean  @default(false)
+  createdAt     DateTime @default(now())
 }
 
 model Campaign {
@@ -91,21 +91,21 @@ model Campaign {
 }
 
 model Creative {
-  id          String  @id @default(cuid())
-  name        String  @unique
-  campaign    String
-  platform    String
-  theme       String
-  angle       String
-  hook        String
-  cta         String
-  audience    String
-  script      String
-  priority    String
-  status      String
-  targetCtr   Float
-  targetRoas  Float
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  name       String   @unique
+  campaign   String
+  platform   String
+  theme      String
+  angle      String
+  hook       String
+  cta        String
+  audience   String
+  script     String
+  priority   String
+  status     String
+  targetCtr  Float
+  targetRoas Float
+  createdAt  DateTime @default(now())
 }
 
 // Daily ad performance records. Seeded with demo data, extended by CSV uploads.
@@ -161,57 +161,57 @@ model AudienceMetric {
 }
 
 model ContentItem {
-  id                 String   @id @default(cuid())
-  title              String
-  platform           String
-  contentType        String
-  goal               String
-  topic              String
-  audience           String
-  hook               String
-  body               String
-  cta                String
-  hookScore          Int
-  relevanceScore     Int
-  conversionScore    Int
-  brandFitScore      Int
-  overallScore       Int
-  whyTest            String
-  howToImprove       String
-  status             String   @default("idea") // idea | testing | scaled | archived
-  mode               String   @default("demo") // demo | ai
-  createdAt          DateTime @default(now())
+  id              String   @id @default(cuid())
+  title           String
+  platform        String
+  contentType     String
+  goal            String
+  topic           String
+  audience        String
+  hook            String
+  body            String
+  cta             String
+  hookScore       Int
+  relevanceScore  Int
+  conversionScore Int
+  brandFitScore   Int
+  overallScore    Int
+  whyTest         String
+  howToImprove    String
+  status          String   @default("idea") // idea | testing | scaled | archived
+  mode            String   @default("demo") // demo | ai
+  createdAt       DateTime @default(now())
 }
 
 model Experiment {
-  id              String   @id @default(cuid())
-  name            String
-  hypothesis      String
-  goal            String
-  primaryMetric   String
-  status          String   @default("running") // draft | running | completed
-  startDate       DateTime
-  endDate         DateTime
-  summary         String
+  id               String              @id @default(cuid())
+  name             String
+  hypothesis       String
+  goal             String
+  primaryMetric    String
+  status           String              @default("running") // draft | running | completed
+  startDate        DateTime
+  endDate          DateTime
+  summary          String
   aiRecommendation String
-  mode            String   @default("demo")
-  createdAt       DateTime @default(now())
-  variants        ExperimentVariant[]
+  mode             String              @default("demo")
+  createdAt        DateTime            @default(now())
+  variants         ExperimentVariant[]
 }
 
 model ExperimentVariant {
-  id          String  @id @default(cuid())
+  id           String     @id @default(cuid())
   experimentId String
-  experiment  Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
-  label       String
-  name        String
-  description String
-  impressions Int
-  clicks      Int
-  conversions Int
-  spend       Float
-  revenue     Float
-  isWinner    Boolean @default(false)
+  experiment   Experiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  label        String
+  name         String
+  description  String
+  impressions  Int
+  clicks       Int
+  conversions  Int
+  spend        Float
+  revenue      Float
+  isWinner     Boolean    @default(false)
 }
 
 model Insight {
@@ -252,21 +252,134 @@ model PromptTemplate {
 }
 
 model EvaluationRecord {
-  id           String @id @default(cuid())
-  task         String
-  agent        String
-  completeness Int
-  relevance    Int
+  id            String   @id @default(cuid())
+  task          String
+  agent         String
+  completeness  Int
+  relevance     Int
   actionability Int
-  accuracy     Int
-  overall      Int
-  notes        String
-  mode         String @default("demo")
-  createdAt    DateTime @default(now())
+  accuracy      Int
+  overall       Int
+  notes         String
+  mode          String   @default("demo")
+  createdAt     DateTime @default(now())
 }
 
 model Setting {
   key       String   @id
   value     String
   updatedAt DateTime @updatedAt
+}
+
+// Anonymous public-demo AI quota. `successCount` only increases after the
+// provider returns a schema-valid response. `inFlightCount` reserves slots
+// while requests are running so concurrent calls cannot exceed the limit.
+model AiVisitorUsage {
+  visitorId       String   @id
+  successCount    Int      @default(0)
+  inFlightCount   Int      @default(0)
+  windowStartedAt DateTime @default(now())
+  windowCount     Int      @default(0)
+  lastReservedAt  DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Global daily guardrail. It counts reserved outbound provider attempts, even
+// when the provider later fails, so retries and rotating visitor IDs remain
+// bounded by a hard daily cap.
+model AiDailyUsage {
+  day          String   @id // YYYY-MM-DD in Asia/Shanghai by default
+  requestCount Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// IP Content Planner (独立模块) —— 「IP 智能选题与短视频内容策划 Agent」
+//
+// 与 MORI 品牌增长数据完全隔离的一组表：一个 IP（人物 / 品牌）进来，
+// 经过 6 个专职 Agent 产出 IP 分析、热点研究、选题池、脚本、
+// 镜头方案、内容矩阵与 7 天内容计划。mode 记录该条数据的生成方式
+// （demo = 本地结构化引擎 / ai = 真实模型 / fallback = AI 失败后回退）。
+// ---------------------------------------------------------------------------
+
+model IpProfile {
+  id             String    @id @default(cuid())
+  name           String
+  industry       String    @default("")
+  city           String    @default("")
+  platforms      String    @default("[]") // JSON array<string>
+  targetCustomer String    @default("")
+  products       String    @default("")
+  goal           String    @default("")
+  analysis       String    @default("{}") // JSON: IpAnalysis
+  trends         String    @default("{}") // JSON: TrendResearch
+  analysisMode   String    @default("demo")
+  trendMode      String    @default("demo")
+  searchStatus   String    @default("{}") // JSON: TrendSearchStatus
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  topics         IpTopic[]
+  plans          IpPlan[]
+
+  @@index([name])
+  @@index([updatedAt])
+}
+
+model IpTopic {
+  id                   String     @id @default(cuid())
+  profileId            String
+  profile              IpProfile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title                String
+  topicType            String
+  painPoint            String
+  value                String
+  hook                 String
+  creative             String
+  potentialStars       Int
+  potentialReason      String
+  hotspotScore         Int
+  painScore            Int
+  ipFitScore           Int
+  differentiationScore Int
+  spreadScore          Int
+  commercialScore      Int
+  overallScore         Int
+  scoreBasis           String     @default("{}") // JSON per-dimension rationale
+  recommendReason      String     @default("")
+  isTop5               Boolean    @default(false)
+  rank                 Int        @default(0)
+  feedback             String     @default("none") // none | like | dislike | saved
+  dislikeReason        String     @default("")
+  mode                 String     @default("demo")
+  createdAt            DateTime   @default(now())
+  scripts              IpScript[]
+
+  @@index([profileId])
+  @@index([overallScore])
+}
+
+model IpScript {
+  id          String   @id @default(cuid())
+  topicId     String
+  topic       IpTopic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  hookVersion String   @default("A")
+  payload     String // JSON: IpScriptBundle (script + shot plan merged)
+  scriptMode  String   @default("demo")
+  shotMode    String   @default("demo")
+  createdAt   DateTime @default(now())
+
+  @@index([topicId])
+}
+
+model IpPlan {
+  id        String    @id @default(cuid())
+  profileId String
+  profile   IpProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  payload   String // JSON: IpPlanBundle (content matrix + 7 day plan)
+  mode      String    @default("demo")
+  createdAt DateTime  @default(now())
+
+  @@index([profileId])
 }

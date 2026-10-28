@@ -3,6 +3,7 @@
 import { Menu, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 
+import { AiUsageBadge } from "@/components/ai/ai-usage-badge";
 import { useTheme } from "@/components/theme-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -32,6 +33,7 @@ export function Topbar({
       </div>
 
       <div className="ml-auto flex flex-wrap items-center gap-2">
+        <AiUsageBadge />
         <span className="hidden max-w-[240px] truncate text-[11px] text-ink-soft xl:block">{datasetLabel}</span>
         <Badge tone="clay" title="全部业务数据均为模拟数据">
           Demo Mode
